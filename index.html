@@ -1,28 +1,69 @@
 <div>
+  <label for="labels">Labels - comma separated:</label><br />
+  <input type="text" id="labels" name="labels" value="" /><br />
+  <input type="submit" value="Submit" id="submit" />
+
   <canvas id="myChart"></canvas>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-  const ctx = document.getElementById('myChart');
+  let submitNode;
 
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-      datasets: [{
-        label: '# of Votes',
+  window.onload = () => {
+    node = document.getElementById("submit");
+    const ctx = document.getElementById("myChart");
+    if (!node || !ctx) return;
+
+    // default data
+    let labels = ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"];
+    let datasets = [
+      {
+        label: "# of Votes",
         data: [12, 19, 3, 5, 2, 3],
-        borderWidth: 1
-      }]
-    },
-    options: {
+        borderWidth: 1,
+      },
+      {
+        label: "# of Alternates",
+        data: [1, 2, 3, 4, 5, 6],
+        borderWidth: 2,
+      },
+    ];
+
+    node.addEventListener("click", (e) => {
+      const inputLabels = document.getElementById('labels').value;
+      if(inputLabels.length){
+        labels = inputLabels.split(",");
+        labels = labels.map(l => l.trim());
+      }
+      buildChart({
+        ctx,
+        labels,
+        datasets
+      });
+    });
+  };
+
+  const buildChart = ({
+    ctx,
+    labels,
+    datasets,
+    options = {
       scales: {
         y: {
-          beginAtZero: true
-        }
-      }
-    }
-  });
+          beginAtZero: true,
+        },
+      },
+    },
+  }) => {
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels,
+        datasets,
+      },
+      options
+    });
+  };
 </script>
