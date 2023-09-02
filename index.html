@@ -1,6 +1,18 @@
+<head>
+  <link rel="stylesheet" type="text/css" href="./style.css" />
+</head>
 <div>
-  <label for="labels">Labels - comma separated:</label><br />
-  <input type="text" id="labels" name="labels" value="" /><br />
+  <div class="flex">
+    <div class="flex grid-config">
+      <label for="labels">Labels (comma separated): </label>
+      <input type="text" id="labels" value="John,Doe" />
+      <label for="data">No. Data: </label>
+      <input type="number" id="data" value="0" />
+      <button onclick="generateGrid()">Generate Grid</button>
+    </div>
+
+    <div id="grid-container"></div>
+  </div>
   <input type="submit" value="Submit" id="submit" />
 
   <canvas id="myChart"></canvas>
@@ -10,6 +22,36 @@
 
 <script>
   let submitNode;
+  let columns;
+  const generateGrid = () => {
+    let labels = document.getElementById("labels").value;
+    const rows = parseInt(document.getElementById("data").value);
+    const gridContainer = document.getElementById("grid-container");
+    const gridConfig = document.querySelector(".grid-config");
+    labels = labels.split(",");
+    columns = labels.map((l) => l.trim());
+
+    for (let i = 0; i < rows + 1; i++) {
+      const rowDiv = document.createElement("div");
+      for (let j = 0; j < columns.length; j++) {
+        if (i == 0) {
+          rowDiv.classList.add("labels");
+          const div = document.createElement("h4");
+          div.innerHTML = labels[j];
+          rowDiv.appendChild(div);
+        } else {
+          rowDiv.classList.add("row");
+          const input = document.createElement("input");
+          input.type = "text";
+          input.classList = "row-data";
+          input.setAttribute("aria-label", j);
+          rowDiv.appendChild(input);
+        }
+      }
+      gridContainer.appendChild(rowDiv);
+    }
+    gridConfig.classList.add("hidden");
+  };
 
   window.onload = () => {
     node = document.getElementById("submit");
@@ -32,15 +74,25 @@
     ];
 
     node.addEventListener("click", (e) => {
-      const inputLabels = document.getElementById('labels').value;
-      if(inputLabels.length){
-        labels = inputLabels.split(",");
-        labels = labels.map(l => l.trim());
+      const inputs = [...document.querySelectorAll(".labels h4")];
+      if (inputs.length) {
+        labels = inputs.map((i) => i.textContent);
       }
+      // columns
+      const data = [...document.querySelectorAll(".row-data")];
+      const parsedData = [];
+      data.forEach((d) => {
+        if (parsedData[d.ariaLabel]) {
+          parsedData[d.ariaLabel].data.push(d.value);
+        } else {
+          parsedData.push({ label: "votes", data: [d.value], borderWidth: 1 });
+        }
+      });
+      datasets = parsedData
       buildChart({
         ctx,
         labels,
-        datasets
+        datasets,
       });
     });
   };
@@ -63,7 +115,7 @@
         labels,
         datasets,
       },
-      options
+      options,
     });
   };
 </script>
