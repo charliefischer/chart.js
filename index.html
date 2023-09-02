@@ -33,6 +33,12 @@
 
     for (let i = 0; i < rows + 1; i++) {
       const rowDiv = document.createElement("div");
+      const xAxisLabel = document.createElement("input");
+      xAxisLabel.type = "text";
+      xAxisLabel.placeholder = "X Axis Label";
+      xAxisLabel.classList = "x-axis-label";
+      if(i !== 0) rowDiv.appendChild(xAxisLabel);
+
       for (let j = 0; j < columns.length; j++) {
         if (i == 0) {
           rowDiv.classList.add("labels");
@@ -74,21 +80,29 @@
     ];
 
     node.addEventListener("click", (e) => {
+      const xAxis = [...document.querySelectorAll(".x-axis-label")];
+      console.log(xAxis)
+      labels = xAxis.map(n => n.value);
+
       const inputs = [...document.querySelectorAll(".labels h4")];
       if (inputs.length) {
-        labels = inputs.map((i) => i.textContent);
+        dataLabels = inputs.map((i) => i.textContent);
       }
-      // columns
       const data = [...document.querySelectorAll(".row-data")];
       const parsedData = [];
       data.forEach((d) => {
         if (parsedData[d.ariaLabel]) {
           parsedData[d.ariaLabel].data.push(d.value);
         } else {
-          parsedData.push({ label: "votes", data: [d.value], borderWidth: 1 });
+          parsedData.push({
+            label: dataLabels[d.ariaLabel],
+            data: [d.value],
+            borderWidth: 1,
+          });
         }
       });
-      datasets = parsedData
+      datasets = parsedData;
+      console.log(datasets, "\n", labels)
       buildChart({
         ctx,
         labels,
